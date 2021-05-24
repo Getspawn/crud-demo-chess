@@ -1,0 +1,71 @@
+<div class="container pt-3">
+    <div [hidden]="!showAlert" class="alert" [ngClass]="{ 'alert-danger': alertType === AlertType.DANGER, 'alert-success': alertType === AlertType.SUCCESS }" role="alert">
+        {{ messageAlert }}
+    </div>
+    <form class="form-horizontal" [formGroup]="form" (ngSubmit)="createUser()">
+        <h3>{{ title }}</h3>
+        <hr style="size: 1rem;" />
+        <div class="form-group" *ngIf="user.nrousu > 0">
+            <label>Id:</label>
+            <label>{{ user.nrousu }}</label>
+        </div>
+        <div class="form-group">
+            <label>Usuario*:</label>
+            <input type="inputName" class="form-control" formControlName="user" placeholder="Ingrese Nombre de usuario">
+        </div>
+        <div class="form-group">
+            <label>Constraseña*:</label>
+            <input type="inputPassword" [type]="fieldTextType ? 'text' : 'password'" class="form-control" formControlName="password" placeholder="Ingrese contraseña">
+            <em class="fa" [ngClass]="{ 'fa-eye-slash': !fieldTextType, 'fa-eye': fieldTextType }" (click)="toggleFieldTextType()"></em>
+        </div>
+        <div class="form-group">
+            <label>Confirmar Contraseña*:</label>
+            <input type="inputConfirmPassword" [type]="repeatFieldTextType ? 'text' : 'password'" class="form-control" formControlName="confirmPassword" placeholder="Confirmar constraseña">
+            <em class="fa" [ngClass]="{ 'fa-eye-slash': !repeatFieldTextType, 'fa-eye': repeatFieldTextType }" (click)="toggleRepeatFieldTextType()"></em>
+            <div class="col-3 text-left row" *ngIf="!passValidator.emptyField">
+                <i class="fa fa-times" style="color:red;" *ngIf="!passValidator.passwordMatch" aria-hidden="true">Las contraseñas no coinciden</i>
+                <i class="fa fa-check" style="color:green;" *ngIf="passValidator.passwordMatch" aria-hidden="true">Las contraseñas coinciden</i>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Nombre:</label>
+            <input type="inputName" class="form-control" formControlName="name" placeholder="Ingrese nombre">
+        </div>
+        <div class="form-group">
+            <label>Apellido:</label>
+            <input type="inputName" class="form-control" formControlName="surname" placeholder="Ingrese apellido">
+        </div>
+        <div class="form-group">
+            <label>Email*:</label>
+            <input type="inputName" class="form-control" formControlName="email" placeholder="Ingrese email">
+        </div>
+        <div class="form-group">
+            <label>Dirección:</label>
+            <input type="inputName" class="form-control" formControlName="address" placeholder="Ingrese dirección">
+        </div>
+        <div class="form-group">
+            <label>Teléfono:</label>
+            <input type="inputName" class="form-control" formControlName="phone" placeholder="Ingrese teléfono">
+        </div>
+        <div class="form-group">
+            <label>Activo*:</label>
+            <select class="form-control" name="active" formControlName="active">
+                <option [value]="true" [selected]="user.activo === true">Si</option>
+                <option [value]="false" [selected]="user.activo === false">No</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Avatar:</label>
+            <input type="file" class="form-control" (change)="onFileChange($event)">
+        </div>
+        <img [src]="avatar" *ngIf="avatar" style="height: 200px; width:200px">
+        <hr style="size: 1rem;" />
+        <div class="form-group">
+            <div class="text-right">
+                <button type="button" class="btn btn-secondary mr-2" style="width: 6rem;"
+                    routerLink="/users">Cancelar</button>
+                <button type="submit" class="btn btn-primary" style="width: 6rem;">Guardar</button>
+            </div>
+        </div>
+    </form>
+</div>

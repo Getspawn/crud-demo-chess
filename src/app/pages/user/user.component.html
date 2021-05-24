@@ -1,0 +1,13 @@
+<div class="container pt-3">
+    <div [hidden]="!showAlert" class="alert" [ngClass]="{ 'alert-danger': alertType === AlertType.DANGER, 'alert-success': alertType === AlertType.SUCCESS }" role="alert">
+        {{ messageAlert }}
+    </div>
+    <h3>Usuarios</h3>
+    <hr style="size: 1rem;" />
+    <div class="form-group">
+        <div class="col-12 text-right">
+            <a class="btn btn-primary" routerLink="/createUser" role="button">Nuevo</a>
+        </div>
+    </div>
+    <app-data-table [columns]="columns" [actions]="actions" [data]="users"></app-data-table>
+</div>

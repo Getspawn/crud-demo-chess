@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { User } from 'src/app/models/user.model';
 import { ApiService } from 'src/app/services/api/api.service';
 import { ActionTable, ColumnTable } from 'src/app/shared/data-table/data-table.component';
@@ -22,9 +23,11 @@ export class UserComponent implements OnInit {
   public alertType = AlertType.DANGER;
 
   constructor(private apiService: ApiService,
-              private router: Router) { }
+    private spinner: NgxSpinnerService,
+    private router: Router) { }
 
   ngOnInit(): void {
+    this.spinner.show();
     this.clearLocalStorage();
     this.tableInit();
     this.dataInit();
@@ -32,9 +35,9 @@ export class UserComponent implements OnInit {
 
   tableInit = (): void => {
     this.columns = [
-      {title: 'Id', dataProperty: 'nrousu'},
-      {title: "Usuario", dataProperty: 'usuario'},
-      {title: "Activo", dataProperty: 'activo'},
+      { title: 'Id', dataProperty: 'nrousu' },
+      { title: "Usuario", dataProperty: 'usuario' },
+      { title: "Activo", dataProperty: 'activo' },
     ];
 
     this.actions = [
@@ -46,7 +49,8 @@ export class UserComponent implements OnInit {
       {
         name: 'Delete',
         click: user => { this.deleteUser(user) },
-        logoClass: 'fa fa-trash icon fa-lg'  },
+        logoClass: 'fa fa-trash icon fa-lg'
+      },
     ];
   }
 
@@ -54,8 +58,10 @@ export class UserComponent implements OnInit {
     this.apiService.getUsers().subscribe(resp => {
       this.users = resp.response.dsUsuariosDemo.ttusuarios;
       this.showAlert = false;
+      this.spinner.hide();
     }, error => {
       this.setAlert(AlertType.DANGER, true, 'Ocurrió un error al obtener los usuarios');
+      this.spinner.hide();
     });
   }
 
@@ -66,11 +72,13 @@ export class UserComponent implements OnInit {
   }
 
   deleteUser(user: User): void {
+    this.spinner.show();
     this.apiService.deleteUser(user).subscribe(resp => {
       this.dataInit();
       this.setAlert(AlertType.SUCCESS, true, 'Usuario eliminado correctamente');
-    }, error =>{
+    }, error => {
       this.setAlert(AlertType.DANGER, true, 'Ocurrió un error al eliminar el usuario');
+      this.spinner.hide();
     });
   }
 

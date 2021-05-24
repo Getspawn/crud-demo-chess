@@ -2,7 +2,7 @@
     <div [hidden]="!showAlert" class="alert" [ngClass]="{ 'alert-danger': alertType === AlertType.DANGER, 'alert-success': alertType === AlertType.SUCCESS }" role="alert">
         {{ messageAlert }}
     </div>
-    <form class="form-horizontal" [formGroup]="form" (ngSubmit)="createUser()">
+    <form class="form-horizontal" [formGroup]="form" (ngSubmit)="openModal()">
         <h3>{{ title }}</h3>
         <hr style="size: 1rem;" />
         <div class="form-group" *ngIf="user.nrousu > 0">

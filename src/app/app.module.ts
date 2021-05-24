@@ -10,6 +10,9 @@ import { UserDetailsComponent } from './pages/user/user-details/user-details.com
 import { HttpClientModule} from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ConfirmDialogComponent } from './shared/confirm-dialog/confirm-dialog.component';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { MatDialogModule } from '@angular/material/dialog';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
   declarations: [
@@ -25,7 +28,10 @@ import { ConfirmDialogComponent } from './shared/confirm-dialog/confirm-dialog.c
     AppRoutingModule,
     HttpClientModule,
     FormsModule, 
-    ReactiveFormsModule
+    ReactiveFormsModule, 
+    NoopAnimationsModule,
+    MatDialogModule,
+    NgxSpinnerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

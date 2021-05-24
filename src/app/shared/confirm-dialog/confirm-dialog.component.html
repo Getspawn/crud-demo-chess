@@ -1,1 +1,18 @@
-<p>confirm-dialog works!</p>
+<div id="modal-content-wrapper">
+    <header id="modal-header">
+        <h5>{{ title }}</h5>
+    </header>
+    <hr style="size: 1rem;" />
+    <section id="modal-body">
+        <p>{{ body }}</p>
+    </section>
+    <hr style="size: 1rem;" />
+    <div>
+        <div class="form-group">
+            <div class="text-right">
+                <button type="button" class="btn btn-secondary mr-2" (click)="close()" style="width: 6rem;">Cancelar</button>
+                <button type="button" class="btn btn-primary" (click)="ok()" style="width: 6rem;">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>

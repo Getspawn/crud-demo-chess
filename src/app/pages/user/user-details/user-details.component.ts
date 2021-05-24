@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { User } from 'src/app/models/user.model';
 import { ApiService } from 'src/app/services/api/api.service';
+import { ConfirmDialogComponent } from 'src/app/shared/confirm-dialog/confirm-dialog.component';
 import { AlertType } from 'src/app/shared/utils/enums';
 import { PasswordValidator } from 'src/app/shared/utils/password-validator';
 
@@ -42,7 +45,9 @@ export class UserDetailsComponent implements OnInit {
 
   constructor(public formBuilder: FormBuilder,
     public router: Router,
-    private apiService: ApiService) { }
+    private apiService: ApiService,
+    private spinner: NgxSpinnerService,
+    private matDialog: MatDialog) { }
 
   ngOnInit(): void {
     this.initializeUser();
@@ -62,8 +67,7 @@ export class UserDetailsComponent implements OnInit {
     });
   }
 
-  createUser(): void {
-
+  openModal(): void {
     if (this.form.invalid) {
       this.setAlert(AlertType.DANGER, true, 'Por favor, verifique los campos obligatorios');
       return;
@@ -76,7 +80,25 @@ export class UserDetailsComponent implements OnInit {
 
     this.setAlert(0, false, '');
 
-    this.user.nrousu = 102;
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = true;
+    dialogConfig.id = 'modal-component';
+    dialogConfig.width = '600px';
+    dialogConfig.data = {
+      title: 'Confirmación',
+      body: this.user.nrousu > 0 ? '¿Está seguro que desea modificar el usuario?' : '¿Está seguro que desea crear el usuario?',
+    };
+
+    const modalDialog = this.matDialog.open(ConfirmDialogComponent, dialogConfig);
+    modalDialog.afterClosed().subscribe(resp  => {
+      if (resp.event === 'confirm') {
+          this.createUser();
+      }
+    });
+  }
+
+  createUser(): void {
+    this.spinner.show();
     this.user.usuario = this.form.value.user;
     this.user.activo = this.form.value.active;
     this.user.clave = this.form.value.password;
@@ -89,8 +111,10 @@ export class UserDetailsComponent implements OnInit {
 
     this.apiService.createUser(this.user).subscribe(resp => {
       this.setAlert(AlertType.SUCCESS, true, 'Usuario creado correctamente');
+      this.spinner.hide();
     }, error => {
       this.setAlert(AlertType.DANGER, true, 'Error al crear el usuario');
+      this.spinner.hide();
     });
   }
 

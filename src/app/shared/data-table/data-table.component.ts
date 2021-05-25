@@ -21,10 +21,11 @@ export class DataTableComponent implements OnInit {
 export interface ColumnTable {
   title: string;
   dataProperty: string;
+  transform?: (item: any) => string;
 }
 
 export interface ActionTable {
   name: string;
-  click?: (item) => void;
+  click?: (item: any) => void;
   logoClass: string;
 }

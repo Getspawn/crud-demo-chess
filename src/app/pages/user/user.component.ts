@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { User } from 'src/app/models/user.model';
 import { ApiService } from 'src/app/services/api/api.service';
+import { ConfirmDialogComponent } from 'src/app/shared/confirm-dialog/confirm-dialog.component';
 import { ActionTable, ColumnTable } from 'src/app/shared/data-table/data-table.component';
 import { AlertType } from 'src/app/shared/utils/enums';
 
@@ -24,7 +26,8 @@ export class UserComponent implements OnInit {
 
   constructor(private apiService: ApiService,
     private spinner: NgxSpinnerService,
-    private router: Router) { }
+    private router: Router,
+    private matDialog: MatDialog) { }
 
   ngOnInit(): void {
     this.spinner.show();
@@ -37,7 +40,7 @@ export class UserComponent implements OnInit {
     this.columns = [
       { title: 'Id', dataProperty: 'nrousu' },
       { title: "Usuario", dataProperty: 'usuario' },
-      { title: "Activo", dataProperty: 'activo' },
+      { title: "Activo", dataProperty: 'activo', transform: item => item ? 'Si' : 'No' },
     ];
 
     this.actions = [
@@ -55,9 +58,9 @@ export class UserComponent implements OnInit {
   }
 
   dataInit(): void {
+    this.showAlert = false;
     this.apiService.getUsers().subscribe(resp => {
       this.users = resp.response.dsUsuariosDemo.ttusuarios;
-      this.showAlert = false;
       this.spinner.hide();
     }, error => {
       this.setAlert(AlertType.DANGER, true, 'Ocurrió un error al obtener los usuarios');
@@ -72,13 +75,30 @@ export class UserComponent implements OnInit {
   }
 
   deleteUser(user: User): void {
-    this.spinner.show();
-    this.apiService.deleteUser(user).subscribe(resp => {
-      this.dataInit();
-      this.setAlert(AlertType.SUCCESS, true, 'Usuario eliminado correctamente');
-    }, error => {
-      this.setAlert(AlertType.DANGER, true, 'Ocurrió un error al eliminar el usuario');
-      this.spinner.hide();
+
+    this.setAlert(0, false, '');
+
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = true;
+    dialogConfig.id = 'modal-component';
+    dialogConfig.width = '600px';
+    dialogConfig.data = {
+      title: 'Confirmación',
+      body: '¿Está seguro que desea eliminar el usuario?'
+    };
+
+    const modalDialog = this.matDialog.open(ConfirmDialogComponent, dialogConfig);
+    modalDialog.afterClosed().subscribe(resp => {
+      if (resp.event === 'confirm') {
+        this.spinner.show();
+        this.apiService.deleteUser(user).subscribe(resp => {
+          this.dataInit();
+          this.setAlert(AlertType.SUCCESS, true, 'Usuario eliminado correctamente');
+        }, error => {
+          this.setAlert(AlertType.DANGER, true, 'Ocurrió un error al eliminar el usuario');
+          this.spinner.hide();
+        });
+      }
     });
   }
 

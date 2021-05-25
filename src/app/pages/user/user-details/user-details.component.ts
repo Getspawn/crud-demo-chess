@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { EmailValidator, FormBuilder, Validators } from '@angular/forms';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -16,6 +16,8 @@ import { PasswordValidator } from 'src/app/shared/utils/password-validator';
 })
 export class UserDetailsComponent implements OnInit {
 
+  @ViewChild('inputFile') inputVariable: ElementRef;
+
   public user: User;
   // Alert
   public AlertType = AlertType;
@@ -25,6 +27,8 @@ export class UserDetailsComponent implements OnInit {
 
   // Password
   public passValidator: PasswordValidator = new PasswordValidator();
+  // Email
+  public mailValidator: EmailValidator = new EmailValidator();
   public fieldTextType: boolean;
   public repeatFieldTextType: boolean;
 
@@ -37,7 +41,7 @@ export class UserDetailsComponent implements OnInit {
     confirmPassword: ['', [Validators.required, this.checkPasswordMatch()]],
     name: [''],
     surname: [''],
-    email: ['', Validators.required],
+    email: ['', [Validators.required, this.emailValidator()]],
     address: [''],
     phone: [''],
     avatar: ['']
@@ -57,13 +61,37 @@ export class UserDetailsComponent implements OnInit {
     this.form.reset({
       user: this.user.usuario,
       active: this.user.activo,
-      password: this.user.clave,
       name: this.user.nombre,
       surname: this.user.apellido,
       email: this.user.email,
       address: this.user.direccion,
       phone: this.user.telefono,
       avatar: this.user.imagen64
+    });
+  }
+
+  resetClean(): void {
+    this.form.patchValue({
+      user: '',
+      active: true,
+      name: '',
+      surname: '',
+      email: '',
+      address: '',
+      phone: '',
+      avatar: ''
+    });
+
+    this.user = new User(0);
+    this.avatar = '';
+    this.inputVariable.nativeElement.value = '';
+    this.cleanPasswords();
+  }
+
+  cleanPasswords(): void {
+    this.form.patchValue({
+      password: '',
+      confirmPassword: '',
     });
   }
 
@@ -92,13 +120,14 @@ export class UserDetailsComponent implements OnInit {
     const modalDialog = this.matDialog.open(ConfirmDialogComponent, dialogConfig);
     modalDialog.afterClosed().subscribe(resp  => {
       if (resp.event === 'confirm') {
-          this.createUser();
+        this.user.nrousu > 0 ? this.updateUser() : this.createUser();
       }
     });
   }
 
   createUser(): void {
     this.spinner.show();
+    this.user.nrousu = Math.floor(Math.random() * 1000);
     this.user.usuario = this.form.value.user;
     this.user.activo = this.form.value.active;
     this.user.clave = this.form.value.password;
@@ -111,9 +140,32 @@ export class UserDetailsComponent implements OnInit {
 
     this.apiService.createUser(this.user).subscribe(resp => {
       this.setAlert(AlertType.SUCCESS, true, 'Usuario creado correctamente');
+      this.resetClean();
       this.spinner.hide();
     }, error => {
       this.setAlert(AlertType.DANGER, true, 'Error al crear el usuario');
+      this.spinner.hide();
+    });
+  }
+
+  updateUser(): void {
+    this.spinner.show();
+    this.user.usuario = this.form.value.user;
+    this.user.activo = this.form.value.active;
+    this.user.clave = this.form.value.password;
+    this.user.nombre = this.form.value.name;
+    this.user.apellido = this.form.value.surname;
+    this.user.email = this.form.value.email;
+    this.user.direccion = this.form.value.address;
+    this.user.telefono = this.form.value.phone;
+    this.user.imagen64 = this.avatar;
+
+    this.apiService.createUser(this.user).subscribe(resp => {
+      this.setAlert(AlertType.SUCCESS, true, 'Usuario modificado correctamente');
+      this.cleanPasswords();
+      this.spinner.hide();
+    }, error => {
+      this.setAlert(AlertType.DANGER, true, 'Error al modificar el usuario');
       this.spinner.hide();
     });
   }
@@ -123,6 +175,7 @@ export class UserDetailsComponent implements OnInit {
 
     if (this.user.nrousu > 0) {
       this.title = 'Editar Usuario'
+      this.avatar = this.user.imagen64;
     }
     else {
       this.title = 'Crear Usuario'
@@ -141,7 +194,6 @@ export class UserDetailsComponent implements OnInit {
       reader.onload = () => {
 
         this.avatar = reader.result as string;
-
       };
     }
   }
@@ -152,6 +204,10 @@ export class UserDetailsComponent implements OnInit {
 
   passwordValidator() {
     return this.passValidator.validate;
+  }
+
+  emailValidator() {
+    return this.mailValidator.validate;
   }
 
   toggleFieldTextType(): void {

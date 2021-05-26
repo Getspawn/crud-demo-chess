@@ -14,11 +14,12 @@
             <tbody>
                 <tr *ngFor="let item of data">
                     <ng-container *ngFor="let col of columns">
-                        <td >{{ item[col.dataProperty] }}</td>
+                        <td *ngIf="col.transform != undefined">{{ col.transform(item[col.dataProperty]) }}</td>
+                        <td *ngIf="col.transform == undefined">{{ item[col.dataProperty] }}</td>
                     </ng-container>
                     <ng-container *ngFor="let action of actions">
                         <td *ngIf="action.click != undefined" class="text-center">
-                            <em class="{{ action.logoClass }}" (click)="action.click(item)"></em>
+                            <em class="{{ action.logoClass }}" (click)="action.click(item)" data-toggle="tooltip" data-placement="top" title="{{ action.tooltip }}"></em>
                         </td>
                         <td *ngIf="action.click == undefined" class="text-center"><em class="{{ action.logoClass }}" (click)="open(item)"></em></td>
                     </ng-container>

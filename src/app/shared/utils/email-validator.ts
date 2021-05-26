@@ -1,8 +1,9 @@
 import { AbstractControl } from "@angular/forms";
 
-export class PasswordValidator {
+export class MailValidator {
 
     public emptyField = true;
+    public validEmail = false;
 
     public validate = (control: AbstractControl) => {
         const email = control.value;
@@ -16,6 +17,13 @@ export class PasswordValidator {
 
         var exp = /^[a-z][\w.-]+@\w[\w.-]+\.[\w.-]*[a-z][a-z]$/i;
 
-        return (!exp.test(email) || !email.trim());
+        if (!exp.test(email) || !email.trim()) {
+            this.validEmail = false;
+        }
+        else {
+            this.validEmail = true;
+        }
+
+        return this.validEmail;
     };
 }

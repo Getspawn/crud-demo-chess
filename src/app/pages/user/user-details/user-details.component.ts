@@ -1,11 +1,12 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { EmailValidator, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { User } from 'src/app/models/user.model';
 import { ApiService } from 'src/app/services/api/api.service';
 import { ConfirmDialogComponent } from 'src/app/shared/confirm-dialog/confirm-dialog.component';
+import { MailValidator } from 'src/app/shared/utils/email-validator';
 import { AlertType } from 'src/app/shared/utils/enums';
 import { PasswordValidator } from 'src/app/shared/utils/password-validator';
 
@@ -28,7 +29,7 @@ export class UserDetailsComponent implements OnInit {
   // Password
   public passValidator: PasswordValidator = new PasswordValidator();
   // Email
-  public mailValidator: EmailValidator = new EmailValidator();
+  public mailValidator: MailValidator = new MailValidator();
   public fieldTextType: boolean;
   public repeatFieldTextType: boolean;
 
@@ -106,6 +107,12 @@ export class UserDetailsComponent implements OnInit {
       return;
     }
 
+    if (!this.mailValidator.validEmail) {
+      this.setAlert(AlertType.DANGER, true, 'Ingrese una dirección de email válida.');
+      return;
+    }
+
+
     this.setAlert(0, false, '');
 
     const dialogConfig = new MatDialogConfig();
@@ -160,7 +167,7 @@ export class UserDetailsComponent implements OnInit {
     this.user.telefono = this.form.value.phone;
     this.user.imagen64 = this.avatar;
 
-    this.apiService.createUser(this.user).subscribe(resp => {
+    this.apiService.updateUser(this.user).subscribe(resp => {
       this.setAlert(AlertType.SUCCESS, true, 'Usuario modificado correctamente');
       this.cleanPasswords();
       this.spinner.hide();

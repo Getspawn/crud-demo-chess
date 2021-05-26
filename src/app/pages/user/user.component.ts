@@ -47,12 +47,14 @@ export class UserComponent implements OnInit {
       {
         name: 'Edit',
         click: user => { this.editUser(user) },
-        logoClass: 'fa fa-pencil icon fa-lg'
+        logoClass: 'fa fa-pencil icon fa-lg',
+        tooltip: 'Editar'
       },
       {
         name: 'Delete',
         click: user => { this.deleteUser(user) },
-        logoClass: 'fa fa-trash icon fa-lg'
+        logoClass: 'fa fa-trash icon fa-lg',
+        tooltip: 'Eliminar'
       },
     ];
   }
